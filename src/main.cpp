@@ -21,6 +21,7 @@ bool primeraLectura = true;
 void setup()
 {
   Serial.begin(9600);
+  system("clear"); // Limpia la consola al inicio
   Serial.println("Monitoreo de humedad y cambios de temperatura con DHT11");
 
   dht.begin();
