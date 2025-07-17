@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Adafruit_Sensor.h>
 #include "DHT.h"
 
 // --- Configuración del Sensor DHT ---
@@ -10,16 +11,21 @@ DHT dht(DHTPIN, DHTTYPE);
 float temperaturaAnterior;
 unsigned long tiempoAnterior; // Usamos 'unsigned long' para millis()
 
+// --- Variables para mediciones en tiempo real ---
+float tempActual;
+float humedadActual;
+
 // Bandera para controlar la primera lectura
 bool primeraLectura = true;
 
 void setup()
 {
   Serial.begin(9600);
+  Serial.println("Monitoreo de humedad y cambios de temperatura con DHT11");
+
   dht.begin();
 
-  // Esperamos un poco para que el sensor se estabilice
-  delay(2000);
+  delay(2000); // Esperamos un poco para que el sensor se estabilice
 
   // --- Tomamos la primera lectura como punto de referencia inicial ---
   temperaturaAnterior = dht.readTemperature();
@@ -41,7 +47,8 @@ void loop()
   // Hacemos una lectura cada 2 segundos para no sobrecargar el sensor
   delay(2000);
 
-  float tempActual = dht.readTemperature();
+  tempActual = dht.readTemperature();
+  humedadActual = dht.readHumidity();
 
   // Ignoramos la iteración si la lectura no es válida
   if (isnan(tempActual))
@@ -72,4 +79,19 @@ void loop()
     temperaturaAnterior = tempActual;
     tiempoAnterior = tiempoActual;
   }
+
+  // Comprueba si alguna de las lecturas falló (retornan NaN - Not a Number)
+  if (isnan(humedadActual) || isnan(tempActual))
+  {
+    Serial.println("Error al leer del sensor DHT!");
+    return; // Sale de la función loop y la inicia de nuevo
+  }
+
+  // Si las lecturas son exitosas, las imprime en el Monitor Serie
+  Serial.print("Humedad: ");
+  Serial.print(humedadActual);
+  Serial.print("%  |  ");
+  Serial.print("Temperatura: ");
+  Serial.print(tempActual);
+  Serial.println(" °C");
 }
