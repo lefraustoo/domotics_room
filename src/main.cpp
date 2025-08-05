@@ -27,7 +27,6 @@
 #include <MFRC522.h>
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
-#include <ArduinoJson.h>
 
 // --- CONFIGURACIÓN DE PINES (Ajusta según tus conexiones) ---
 #define DHT_PIN 4      // Pin de datos del DHT22
